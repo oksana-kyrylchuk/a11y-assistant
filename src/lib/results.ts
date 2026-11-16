@@ -1,11 +1,16 @@
-import type { Result } from 'axe-core'
+import type { NodeResult, Result } from 'axe-core'
 
 export const SEVERITIES = ['critical', 'serious', 'moderate', 'minor'] as const
 export type Severity = (typeof SEVERITIES)[number]
 
 export interface IssueNode {
-  /** CSS selector path to the element, as reported by axe. */
-  target: string
+  /**
+   * Path to the element as reported by axe: one entry per frame, where an
+   * entry is either a CSS selector or a list of selectors through shadow roots.
+   */
+  target: NodeResult['target']
+  /** The same path as a single string, for display. */
+  selector: string
   html: string
 }
 
@@ -29,8 +34,8 @@ export function toIssues(violations: Result[]): Issue[] {
     help: violation.help,
     helpUrl: violation.helpUrl,
     nodes: violation.nodes.map((node) => ({
-      // Each entry is one frame or shadow-root step on the way to the element.
-      target: node.target.flat().join(' '),
+      target: node.target,
+      selector: node.target.flat().join(' '),
       html: node.html,
     })),
   }))
