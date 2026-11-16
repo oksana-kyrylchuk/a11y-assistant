@@ -21,3 +21,5 @@ Expected result with axe-core 4.14: 9 issues on 9 elements.
 | Moderate | `heading-order` | `#skipped-level` |
 | Moderate | `region` | `#outside-landmark` |
 | Minor | `empty-heading` | `#empty-heading` |
+
+`clean.html` has no violations: the scan should report "No issues found". The two pages link to each other, which is handy for checking that results are cleared after navigation.
