@@ -31,6 +31,7 @@
 
       <!-- image-alt: image without alternative text -->
       <img
+        id="swatch"
         class="swatch"
         src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
       />
@@ -42,13 +43,13 @@
       <input type="text" id="search" />
 
       <!-- color-contrast: light grey text on white -->
-      <p class="low-contrast">This text is too light to read comfortably.</p>
+      <p id="low-contrast" class="low-contrast">This text is too light to read comfortably.</p>
 
       <!-- link-name: link without text -->
       <a href="https://example.com/" id="empty-link"></a>
 
       <!-- heading-order: h1 followed by h3 -->
-      <h3>A heading that skips a level</h3>
+      <h3 id="skipped-level">A heading that skips a level</h3>
 
       <!-- empty-heading: heading without content -->
       <h2 id="empty-heading"></h2>
