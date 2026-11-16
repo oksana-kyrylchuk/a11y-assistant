@@ -12,6 +12,8 @@ export interface IssueNode {
   /** The same path as a single string, for display. */
   selector: string
   html: string
+  /** What axe says is wrong with this element. */
+  failureSummary: string
 }
 
 export interface Issue {
@@ -37,6 +39,7 @@ export function toIssues(violations: Result[]): Issue[] {
       target: node.target,
       selector: node.target.flat().join(' '),
       html: node.html,
+      failureSummary: node.failureSummary ?? '',
     })),
   }))
 }

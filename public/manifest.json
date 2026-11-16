@@ -25,5 +25,8 @@
     "scripting",
     "sidePanel",
     "storage"
+  ],
+  "host_permissions": [
+    "https://generativelanguage.googleapis.com/*"
   ]
 }

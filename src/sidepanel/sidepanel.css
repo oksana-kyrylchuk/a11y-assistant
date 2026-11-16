@@ -99,10 +99,15 @@ button {
   margin: 0 0 4px;
 }
 
-.node {
-  display: block;
-  width: 100%;
+.node-row {
+  display: flex;
+  gap: 6px;
   margin-top: 4px;
+}
+
+.node {
+  flex: 1;
+  min-width: 0;
   padding: 4px 8px;
   text-align: left;
   color: inherit;
@@ -123,6 +128,28 @@ button {
 .node code {
   font-size: 0.85rem;
   overflow-wrap: anywhere;
+}
+
+.explain {
+  padding: 4px 10px;
+}
+
+.explain:disabled {
+  cursor: progress;
+}
+
+.explanation > * {
+  margin: 8px 0 0;
+}
+
+.explanation pre {
+  padding: 8px;
+  /* The panel is narrow: wrap long lines instead of scrolling sideways. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
 }
 
 .settings {

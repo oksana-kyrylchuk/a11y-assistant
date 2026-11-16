@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react'
+import { parseExplanation } from '../lib/explanation'
 import { clearHighlight, highlightNode } from '../lib/highlight'
+import { requestExplanation } from '../lib/messages'
 import {
   countElements,
   groupBySeverity,
+  type Issue,
   type IssueNode,
   type Severity,
 } from '../lib/results'
@@ -19,6 +22,11 @@ type ScanState =
   | { status: 'scanning' }
   | { status: 'error'; message: string }
   | { status: 'done'; result: ScanResult }
+
+type Explanation =
+  | { status: 'loading' }
+  | { status: 'done'; text: string }
+  | { status: 'error'; message: string }
 
 const SEVERITY_LABELS: Record<Severity, string> = {
   critical: 'Critical',
@@ -46,6 +54,10 @@ export function App() {
   // Key of the element currently highlighted on the page.
   const [selected, setSelected] = useState<string | null>(null)
   const [highlightError, setHighlightError] = useState<string | null>(null)
+  // Explanations by element key. They belong to the current results.
+  const [explanations, setExplanations] = useState<Record<string, Explanation>>(
+    {},
+  )
 
   const result = state.status === 'done' ? state.result : null
 
@@ -59,6 +71,7 @@ export function App() {
       setState({ status: 'idle', note })
       setSelected(null)
       setHighlightError(null)
+      setExplanations({})
     }
 
     async function handleActivated() {
@@ -94,6 +107,7 @@ export function App() {
     setState({ status: 'scanning' })
     setSelected(null)
     setHighlightError(null)
+    setExplanations({})
     try {
       setState({ status: 'done', result: await scanActiveTab() })
     } catch (error) {
@@ -117,6 +131,31 @@ export function App() {
       setHighlightError(
         `Could not highlight the element: ${error instanceof Error ? error.message : String(error)}`,
       )
+    }
+  }
+
+  async function handleExplain(key: string, issue: Issue, node: IssueNode) {
+    const update = (explanation: Explanation) =>
+      setExplanations((current) => ({ ...current, [key]: explanation }))
+
+    update({ status: 'loading' })
+    try {
+      const reply = await requestExplanation({
+        ruleId: issue.ruleId,
+        help: issue.help,
+        failureSummary: node.failureSummary,
+        html: node.html,
+      })
+      update(
+        reply.ok
+          ? { status: 'done', text: reply.text }
+          : { status: 'error', message: reply.message },
+      )
+    } catch {
+      update({
+        status: 'error',
+        message: 'Could not reach the extension background. Reload the extension.',
+      })
     }
   }
 
@@ -150,7 +189,13 @@ export function App() {
       )}
 
       {result && (
-        <Results result={result} selected={selected} onSelect={handleSelect} />
+        <Results
+          result={result}
+          selected={selected}
+          explanations={explanations}
+          onSelect={handleSelect}
+          onExplain={handleExplain}
+        />
       )}
 
       <Settings />
@@ -175,10 +220,18 @@ function Summary({ result }: { result: ScanResult }) {
 interface ResultsProps {
   result: ScanResult
   selected: string | null
+  explanations: Record<string, Explanation>
   onSelect: (key: string, node: IssueNode) => void
+  onExplain: (key: string, issue: Issue, node: IssueNode) => void
 }
 
-function Results({ result, selected, onSelect }: ResultsProps) {
+function Results({
+  result,
+  selected,
+  explanations,
+  onSelect,
+  onExplain,
+}: ResultsProps) {
   return (
     <>
       {groupBySeverity(result.issues).map(({ severity, issues }) => (
@@ -199,16 +252,29 @@ function Results({ result, selected, onSelect }: ResultsProps) {
                 <ul className="nodes">
                   {issue.nodes.map((node) => {
                     const key = `${issue.ruleId} ${node.selector}`
+                    const explanation = explanations[key]
                     return (
                       <li key={key}>
-                        <button
-                          type="button"
-                          className="node"
-                          aria-pressed={selected === key}
-                          onClick={() => onSelect(key, node)}
-                        >
-                          <code>{node.selector}</code>
-                        </button>
+                        <div className="node-row">
+                          <button
+                            type="button"
+                            className="node"
+                            aria-pressed={selected === key}
+                            onClick={() => onSelect(key, node)}
+                          >
+                            <code>{node.selector}</code>
+                          </button>
+                          <button
+                            type="button"
+                            className="explain"
+                            aria-label={`Explain ${issue.ruleId} on ${node.selector}`}
+                            disabled={explanation?.status === 'loading'}
+                            onClick={() => onExplain(key, issue, node)}
+                          >
+                            Explain
+                          </button>
+                        </div>
+                        <ExplanationView explanation={explanation} />
                       </li>
                     )
                   })}
@@ -219,5 +285,29 @@ function Results({ result, selected, onSelect }: ResultsProps) {
         </section>
       ))}
     </>
+  )
+}
+
+function ExplanationView({ explanation }: { explanation?: Explanation }) {
+  // The live region is always present, so screen readers announce changes.
+  return (
+    <div className="explanation" aria-live="polite">
+      {explanation?.status === 'loading' && (
+        <p className="status">Asking Gemini…</p>
+      )}
+      {explanation?.status === 'error' && (
+        <p className="error">{explanation.message}</p>
+      )}
+      {explanation?.status === 'done' &&
+        parseExplanation(explanation.text).map((block, index) =>
+          block.type === 'code' ? (
+            <pre key={index}>
+              <code>{block.content}</code>
+            </pre>
+          ) : (
+            <p key={index}>{block.content}</p>
+          ),
+        )}
+    </div>
   )
 }
