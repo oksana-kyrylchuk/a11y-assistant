@@ -21,3 +21,10 @@ Then load the `dist` folder as an unpacked extension:
 Click the extension icon in the toolbar to open the side panel.
 
 `npm run dev` rebuilds `dist` on every change; reload the extension on the extensions page to pick it up.
+
+## Explain (optional)
+
+Each reported element has an **Explain** button that asks Google Gemini why the issue matters and how to fix it. It needs your own API key from [Google AI Studio](https://aistudio.google.com/): open **Settings** at the bottom of the panel and paste it there. Scanning and highlighting work without a key.
+
+- The key is stored in `chrome.storage.local` in your browser and is only sent to `generativelanguage.googleapis.com`.
+- Explaining an issue sends the rule and the HTML of that element to Google. On the free tier Google may use this content to improve its products.
