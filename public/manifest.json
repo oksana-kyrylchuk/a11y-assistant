@@ -20,5 +20,8 @@
     "service_worker": "service-worker.js",
     "type": "module"
   },
-  "permissions": ["sidePanel"]
+  "permissions": [
+    "activeTab",
+    "sidePanel"
+  ]
 }
