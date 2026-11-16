@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite build --watch --mode development",
     "build": "tsc -b && vite build",
-    "lint": "oxlint"
+    "lint": "oxlint",
+    "test-page": "vite test-pages --port 5180 --strictPort"
   },
   "dependencies": {
     "axe-core": "^4.14.1",
