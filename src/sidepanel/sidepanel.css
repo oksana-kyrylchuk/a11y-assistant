@@ -124,3 +124,46 @@ button {
   font-size: 0.85rem;
   overflow-wrap: anywhere;
 }
+
+.settings {
+  margin-top: 24px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.settings summary {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.settings form {
+  margin-top: 8px;
+}
+
+.settings label {
+  display: block;
+  margin-top: 12px;
+  font-weight: 600;
+}
+
+.settings input {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 4px 0;
+  padding: 6px 8px;
+  font: inherit;
+}
+
+.settings .actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.settings .actions button {
+  padding: 6px 14px;
+}
+
+.hint {
+  color: var(--muted);
+}

@@ -17,3 +17,9 @@ chrome.action.onClicked.addListener((tab) => {
 chrome.sidePanel
   .setPanelBehavior({ openPanelOnActionClick: false })
   .catch((error: unknown) => console.error(error))
+
+// Keep the API key out of reach of scripts injected into pages: only
+// extension pages and this worker may read storage.
+chrome.storage.local
+  .setAccessLevel({ accessLevel: 'TRUSTED_CONTEXTS' })
+  .catch((error: unknown) => console.error(error))

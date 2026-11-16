@@ -12,6 +12,7 @@ import {
   scanActiveTab,
   type ScanResult,
 } from '../lib/scan'
+import { Settings } from './Settings'
 
 type ScanState =
   | { status: 'idle'; note?: string }
@@ -151,6 +152,8 @@ export function App() {
       {result && (
         <Results result={result} selected={selected} onSelect={handleSelect} />
       )}
+
+      <Settings />
     </main>
   )
 }
