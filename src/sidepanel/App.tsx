@@ -1,15 +1,20 @@
-import { useState } from 'react'
-import { highlightNode } from '../lib/highlight'
+import { useEffect, useState } from 'react'
+import { clearHighlight, highlightNode } from '../lib/highlight'
 import {
   countElements,
   groupBySeverity,
   type IssueNode,
   type Severity,
 } from '../lib/results'
-import { NoTabAccessError, scanActiveTab, type ScanResult } from '../lib/scan'
+import {
+  getActiveTab,
+  NoTabAccessError,
+  scanActiveTab,
+  type ScanResult,
+} from '../lib/scan'
 
 type ScanState =
-  | { status: 'idle' }
+  | { status: 'idle'; note?: string }
   | { status: 'scanning' }
   | { status: 'error'; message: string }
   | { status: 'done'; result: ScanResult }
@@ -31,6 +36,10 @@ function plural(count: number, word: string) {
   return `${count} ${word}${count === 1 ? '' : 's'}`
 }
 
+function withoutHash(url: string) {
+  return url.split('#')[0]
+}
+
 export function App() {
   const [state, setState] = useState<ScanState>({ status: 'idle' })
   // Key of the element currently highlighted on the page.
@@ -38,6 +47,47 @@ export function App() {
   const [highlightError, setHighlightError] = useState<string | null>(null)
 
   const result = state.status === 'done' ? state.result : null
+
+  // Results describe one page in one tab. Drop them as soon as the user
+  // looks at another tab or the page is replaced.
+  useEffect(() => {
+    if (!result) return
+    const { tabId, url } = result
+
+    function reset(note: string) {
+      setState({ status: 'idle', note })
+      setSelected(null)
+      setHighlightError(null)
+    }
+
+    async function handleActivated() {
+      const tab = await getActiveTab()
+      if (tab?.id === tabId) return
+      // The scanned tab is still open in the background: tidy it up.
+      clearHighlight(tabId).catch(() => {})
+      reset('Results cleared: you switched to another tab.')
+    }
+
+    function handleUpdated(
+      updatedTabId: number,
+      change: chrome.tabs.OnUpdatedInfo,
+    ) {
+      if (updatedTabId !== tabId || change.status !== 'loading') return
+      // Every navigation reports "loading": a reload without a URL, anything
+      // else with the new one. Jumping to an anchor keeps the same document.
+      const sameDocument =
+        change.url !== undefined &&
+        withoutHash(change.url) === withoutHash(url)
+      if (!sameDocument) reset('Results cleared: the page has changed.')
+    }
+
+    chrome.tabs.onActivated.addListener(handleActivated)
+    chrome.tabs.onUpdated.addListener(handleUpdated)
+    return () => {
+      chrome.tabs.onActivated.removeListener(handleActivated)
+      chrome.tabs.onUpdated.removeListener(handleUpdated)
+    }
+  }, [result])
 
   async function handleScan() {
     setState({ status: 'scanning' })
@@ -83,7 +133,7 @@ export function App() {
       </button>
 
       <p className="status" role="status">
-        {state.status === 'idle' && 'No scan yet.'}
+        {state.status === 'idle' && (state.note ?? 'No scan yet.')}
         {state.status === 'scanning' && 'Scanning…'}
         {result && <Summary result={result} />}
       </p>
