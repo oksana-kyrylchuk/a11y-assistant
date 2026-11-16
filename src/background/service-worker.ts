@@ -10,3 +10,10 @@ chrome.action.onClicked.addListener((tab) => {
     .open({ windowId: tab.windowId })
     .catch((error: unknown) => console.error(error))
 })
+
+// The panel behavior is stored in the browser profile and survives extension
+// updates, so switch it off explicitly: while it is on, action.onClicked
+// never fires.
+chrome.sidePanel
+  .setPanelBehavior({ openPanelOnActionClick: false })
+  .catch((error: unknown) => console.error(error))
