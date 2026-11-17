@@ -87,12 +87,14 @@ export function App() {
       change: chrome.tabs.OnUpdatedInfo,
     ) {
       if (updatedTabId !== tabId || change.status !== 'loading') return
-      // Every navigation reports "loading": a reload without a URL, anything
-      // else with the new one. Jumping to an anchor keeps the same document.
-      const sameDocument =
+      // Every navigation reports "loading", a reload too, sometimes with the
+      // unchanged URL. Only a jump to an anchor, where just the part after
+      // "#" changes, keeps the same document.
+      const anchorJump =
         change.url !== undefined &&
+        change.url !== url &&
         withoutHash(change.url) === withoutHash(url)
-      if (!sameDocument) reset('Results cleared: the page has changed.')
+      if (!anchorJump) reset('Results cleared: the page has changed.')
     }
 
     chrome.tabs.onActivated.addListener(handleActivated)
