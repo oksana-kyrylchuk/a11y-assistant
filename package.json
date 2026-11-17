@@ -7,7 +7,9 @@
     "dev": "vite build --watch --mode development",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "test-page": "vite test-pages --port 5180 --strictPort"
+    "test-page": "vite test-pages --port 5180 --strictPort",
+    "test": "vitest run",
+    "typecheck:tests": "tsc -p tsconfig.tests.json"
   },
   "dependencies": {
     "axe-core": "^4.14.1",
@@ -22,6 +24,7 @@
     "@vitejs/plugin-react": "^6.3.0",
     "oxlint": "^1.94.0",
     "typescript": "~6.0.2",
-    "vite": "^8.3.8"
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0"
   }
 }
