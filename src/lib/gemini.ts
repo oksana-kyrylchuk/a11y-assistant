@@ -105,7 +105,7 @@ export async function explain(
     const timedOut = error instanceof DOMException && error.name === 'TimeoutError'
     throw new ExplainError(
       timedOut
-        ? 'Gemini did not answer in time. Try again.'
+        ? 'Gemini did not answer in time. Try again, or choose a faster model in Settings, such as a Flash-Lite model.'
         : 'Could not reach Gemini. Check your connection.',
     )
   }

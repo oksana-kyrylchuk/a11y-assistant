@@ -1,6 +1,8 @@
 /** Settings live in chrome.storage.local: on this device only, never synced. */
 
-export const DEFAULT_MODEL = 'gemini-3.8-flash'
+// A Flash-Lite model: answers in about a second. Larger Flash models can take
+// longer than the 25-second limit an extension service worker allows.
+export const DEFAULT_MODEL = 'gemini-3.5-flash-lite'
 
 const API_KEY = 'geminiApiKey'
 const MODEL = 'geminiModel'
