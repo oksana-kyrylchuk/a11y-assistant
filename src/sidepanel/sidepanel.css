@@ -9,6 +9,9 @@
 
 body {
   margin: 0;
+  /* Explicit system colors, so contrast checks see the real dark background. */
+  color: CanvasText;
+  background: Canvas;
 }
 
 main {
