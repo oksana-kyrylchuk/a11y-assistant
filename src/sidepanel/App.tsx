@@ -106,6 +106,7 @@ export function App() {
   }, [result])
 
   async function handleScan() {
+    if (state.status === 'scanning') return
     setState({ status: 'scanning' })
     setSelected(null)
     setHighlightError(null)
@@ -169,7 +170,9 @@ export function App() {
         type="button"
         className="scan"
         onClick={handleScan}
-        disabled={state.status === 'scanning'}
+        // aria-disabled instead of disabled: a disabled button loses focus,
+        // which would drop keyboard users back to the top of the panel.
+        aria-disabled={state.status === 'scanning'}
       >
         {state.status === 'done' ? 'Scan again' : 'Scan page'}
       </button>
@@ -270,8 +273,12 @@ function Results({
                             type="button"
                             className="explain"
                             aria-label={`Explain ${issue.ruleId} on ${node.selector}`}
-                            disabled={explanation?.status === 'loading'}
-                            onClick={() => onExplain(key, issue, node)}
+                            aria-disabled={explanation?.status === 'loading'}
+                            onClick={() => {
+                              if (explanation?.status !== 'loading') {
+                                onExplain(key, issue, node)
+                              }
+                            }}
                           >
                             Explain
                           </button>

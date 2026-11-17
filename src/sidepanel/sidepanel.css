@@ -47,7 +47,7 @@ button {
   font-weight: 600;
 }
 
-.scan:disabled {
+.scan[aria-disabled='true'] {
   cursor: progress;
 }
 
@@ -134,7 +134,7 @@ button {
   padding: 4px 10px;
 }
 
-.explain:disabled {
+.explain[aria-disabled='true'] {
   cursor: progress;
 }
 
