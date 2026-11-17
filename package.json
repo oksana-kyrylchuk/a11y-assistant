@@ -9,6 +9,7 @@
     "lint": "oxlint",
     "test-page": "vite test-pages --port 5180 --strictPort",
     "test": "vitest run",
+    "test:e2e": "npm run build && playwright test",
     "typecheck:tests": "tsc -p tsconfig.tests.json"
   },
   "dependencies": {
@@ -17,6 +18,7 @@
     "react-dom": "^19.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "1.65.1",
     "@types/chrome": "^0.3.7",
     "@types/node": "^24.19.2",
     "@types/react": "^19.3.0",
