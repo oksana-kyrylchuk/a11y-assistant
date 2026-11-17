@@ -28,3 +28,14 @@ Each reported element has an **Explain** button that asks Google Gemini why the 
 
 - The key is stored in `chrome.storage.local` in your browser and is only sent to `generativelanguage.googleapis.com`.
 - Explaining an issue sends the rule and the HTML of that element to Google. On the free tier Google may use this content to improve its products.
+
+## Tests
+
+```sh
+npm test            # unit tests (Vitest)
+npm run test:e2e    # builds the extension and runs the Playwright tests
+```
+
+The end-to-end tests load the built extension into Chromium, click its toolbar icon through the `Extensions.triggerAction` DevTools command (that click is what grants `activeTab`), and drive the side panel against the pages in `test-pages`. Gemini responses are mocked with `context.route`, so no API key is needed. Install the browser once with `npx playwright install chromium`.
+
+CI runs lint, type checks, unit and end-to-end tests on every push to `main`.
